@@ -34,7 +34,6 @@ async function getDatasetOwner(datasetAddress) {
 }
 
 async function sendNotification(datasetAddress, recipientAdress, message) {
-
   try {
     const appSecret = JSON.parse(DEVELOPER_APP_SECRET);
 
