@@ -1,2 +1,4 @@
 
 test_bot/
+node_modules/
+package-lock.json
