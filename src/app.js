@@ -16,24 +16,17 @@ const User = mongoose.model("User", UserSchema);
 
 
 async function getDatasetOwner(datasetAddress) {
-
   let owner = web3.eth.net.isListening()
     .then(async () => {
-
       let datasetRegistry = new web3.eth.Contract(datasetRegistryABI, datasetRegistryAddress);
       return await datasetRegistry.methods.ownerOf(datasetAddress).call();
-
     })
     .catch(e => console.log('Wow. Something went wrong: ' + e));
 
   return owner;
-
-  //  web3.eth.getCode("0x6a307006c866f7d419d64aad89ceee8ae51916d0").then(console.log );
-
 }
 
 async function sendNotification(datasetAddress, recipientAdress, message) {
-
   try {
     const appSecret = JSON.parse(DEVELOPER_APP_SECRET);
 
