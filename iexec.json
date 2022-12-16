@@ -1,32 +1,32 @@
 {
-  "description": "My iExec ressource description, must be at least 150 chars long in order to pass the validation checks. Describe your application, dataset or workerpool to your users",
-  "license": "MIT",
-  "author": "?",
-  "social": {
-    "website": "?",
-    "github": "?"
-  },
-  "logo": "logo.png",
-  "buyConf": {
-    "params": {
-      "iexec_args": ""
+    "description": "My iExec ressource description, must be at least 150 chars long in order to pass the validation checks. Describe your application, dataset or workerpool to your users",
+    "license": "MIT",
+    "author": "?",
+    "social": {
+        "website": "?",
+        "github": "?"
     },
-    "tag": "0x0000000000000000000000000000000000000000000000000000000000000001",
-    "trust": "0",
-    "callback": "0x0000000000000000000000000000000000000000"
-  },
-  "app": {
-    "owner": "0x9aDE85a3D0C0E13D6a2De61aF3778506E69F4f26",
-    "name": "ace-ft-tee",
-    "type": "DOCKER",
-    "multiaddr": "docker.io/bcpl99/ace-ft-tee:0.1.0",
-    "checksum": "0x15bed530c76f1f3b05b2db8d44c417128b8934899bc85804a655a01b441bfa78",
-    "mrenclave": {
-      "provider": "SCONE",
-      "version": "v5",
-      "entrypoint": "python /app/app.py",
-      "heapSize": 1073741824,
-      "fingerprint": "fd8b27e9a3cac8dbf2f64e0dcecb8aa31f8223bbf59b012727d21130d4e1c490"
+    "logo": "logo.png",
+    "buyConf": {
+        "params": {
+            "iexec_args": ""
+        },
+        "tag": "0x0000000000000000000000000000000000000000000000000000000000000001",
+        "trust": "0",
+        "callback": "0x0000000000000000000000000000000000000000"
+    },
+    "app": {
+        "owner": "0x9aDE85a3D0C0E13D6a2De61aF3778506E69F4f26",
+        "name": "ace-ft-tee",
+        "type": "DOCKER",
+        "multiaddr": "docker.io/bcpl99/ace-ft-tee:0.1.0",
+        "checksum": "0x15bed530c76f1f3b05b2db8d44c417128b8934899bc85804a655a01b441bfa78",
+        "mrenclave": {
+            "provider": "SCONE",
+            "version": "v5",
+            "entrypoint": "python /app/app.py",
+            "heapSize": 1073741824,
+            "fingerprint": "fd8b27e9a3cac8dbf2f64e0dcecb8aa31f8223bbf59b012727d21130d4e1c490"
+        }
     }
-  }
 }
