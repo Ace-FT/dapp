@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "iexec": "^7.2.3",
+    "web3": "^1.8.1",
     "mongoose": "^6.8.0",
     "node-telegram-bot-api": "^0.60.0"
   }
