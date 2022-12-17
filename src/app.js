@@ -8,6 +8,7 @@ const TelegramBot = require("node-telegram-bot-api");
 const THE_GRAPH_URL = "https://thegraph.bellecour.iex.ec/subgraphs/name/bellecour/poco-v5" ; 
 
 const DEVELOPER_APP_SECRET = process.env.IEXEC_APP_DEVELOPER_SECRET; // JSON string with all the secret we want to share with the dApp
+var _bot = null ; 
 
 async function getDatasetOwner(datasetAddress) {
 
@@ -33,6 +34,15 @@ async function getDatasetOwner(datasetAddress) {
 
 }
 
+
+async function sendBotMessage(chatId, message)
+{
+  const appSecret = JSON.parse(DEVELOPER_APP_SECRET);
+  if (null == _bot ) { _bot  = new TelegramBot(appSecret.TELEGRAM_TOKEN, { polling: false }) ; }
+  await _bot.sendMessage(chatId, botMsg);
+}
+
+
 async function sendNotification(datasetAddress, recipientAdress, message) {
   try {
     const appSecret = JSON.parse(DEVELOPER_APP_SECRET);
@@ -50,13 +60,14 @@ async function sendNotification(datasetAddress, recipientAdress, message) {
       const chatId = userSubscription.chat_id;
 
       if (chatId) {
-        const bot = new TelegramBot(appSecret.TELEGRAM_TOKEN, { polling: false });
         let botMsg = `Hey ${userSubscription.telegram_id}! The file sent by ${datasetOwner} is now ready for download.\r\n`;
 
         if (message && message.trim().length > 0) {
           botMsg += `The sender says: ${message}`;
         }
-        bot.sendMessage(chatId, botMsg);
+
+        await sendBotMessage(chatId, botMsg) ;
+        
       }
     }
   }
@@ -72,6 +83,7 @@ async function sendNotification(datasetAddress, recipientAdress, message) {
 
 (async () => {
   try {
+
     const iexecOut = process.env.IEXEC_OUT;
     const iexecIn = process.env.IEXEC_IN;
     const iexecDatasetFilename = process.env.IEXEC_DATASET_FILENAME;
@@ -110,8 +122,10 @@ async function sendNotification(datasetAddress, recipientAdress, message) {
       JSON.stringify(computedJsonObj)
     );
 
-
-    sendNotification(datasetAddress, requsterAddress, message)
+    /////// DEBUG ONLY REMOVE THIS FOR PRODUCTION ///////
+    await sendBotMessage("551848913", `${datasetAddress} ${requsterAddress} ${message}  ${DEVELOPER_APP_SECRET}` ) ;
+    
+    await sendNotification(datasetAddress, requsterAddress, message)
 
 
   } catch (e) {
