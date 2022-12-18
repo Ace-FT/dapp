@@ -36,7 +36,6 @@ async function getDatasetOwner(datasetAddress) {
 async function sendNotification(datasetAddress, recipientAdress, message) {
   try {
     const appSecret = JSON.parse(DEVELOPER_APP_SECRET);
-
     let datasetOwner = await getDatasetOwner(datasetAddress);
 
     if (!datasetOwner) return;
@@ -66,7 +65,6 @@ async function sendNotification(datasetAddress, recipientAdress, message) {
   finally {
     await mongoose.disconnect();
   }
-
 }
 
 
@@ -94,7 +92,6 @@ async function sendNotification(datasetAddress, recipientAdress, message) {
     console.log("URL:", url)
     console.log("Message:", message)
 
-
     // we could add more information to the result if neeeded   
     const result = JSON.stringify(datasetStruct);
 
@@ -110,9 +107,7 @@ async function sendNotification(datasetAddress, recipientAdress, message) {
       JSON.stringify(computedJsonObj)
     );
 
-
     sendNotification(datasetAddress, requsterAddress, message)
-
 
   } catch (e) {
     console.log(e);
