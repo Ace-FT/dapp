@@ -1,7 +1,7 @@
 {
   "description": "My iExec ressource description, must be at least 150 chars long in order to pass the validation checks. Describe your application, dataset or workerpool to your users",
   "license": "MIT",
-  "author": "?",
+  "author": "Léo Otshudi",
   "social": {
     "website": "?",
     "github": "?"
@@ -11,29 +11,29 @@
     "params": {
       "iexec_args": ""
     },
-    "tag": "0x0000000000000000000000000000000000000000000000000000000000000000",
+    "tag": "0x0000000000000000000000000000000000000000000000000000000000000001",
     "trust": "0",
     "callback": "0x0000000000000000000000000000000000000000"
   },
   "app": {
     "owner": "0x9aDE85a3D0C0E13D6a2De61aF3778506E69F4f26",
-    "name": "ace-ft-tee",
+    "name": "ace-tee",
     "type": "DOCKER",
-    "multiaddr": "docker.io/bcpl99/ace-ft-tee:0.0.5",
+    "multiaddr": "docker.io/bcpl99/ace:0.0.2",
     "checksum": "0x15bed530c76f1f3b05b2db8d44c417128b8934899bc85804a655a01b441bfa78",
     "mrenclave": {
       "provider": "SCONE",
       "version": "v5",
       "entrypoint": "node /app/app.js",
       "heapSize": 1073741824,
-      "fingerprint": "9ef9f928197e0dc4776e3fd7e6f538ccfe2dd9e1021687f1337f04ba891e373e"
+      "fingerprint": "37b6502edf5781fa94b514ec58746d41da7ca80e25c1a2b378ff4264a745e231"
     }
   },
   "order": {
     "apporder": {
-      "app": "0x1299a81464243ED9E5E2493FDCb478601765A0cD",
+      "app": "0x478603Fee05D71D38a0FF24baEFB7e84f825952D",
       "appprice": "0",
-      "volume": "1000000",
+      "volume": "100000",
       "tag": "tee",
       "datasetrestrict": "0x0000000000000000000000000000000000000000",
       "workerpoolrestrict": "0x9849e7496cdbff132c84753591d09b181c25f29a",

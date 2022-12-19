@@ -1,4 +1,5 @@
 test/
+.DS_Store
 test_bot/
 node_modules/
 package-lock.json
