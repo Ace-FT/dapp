@@ -10,10 +10,7 @@ const THE_GRAPH_URL = "https://thegraph.bellecour.iex.ec/subgraphs/name/bellecou
 const DEVELOPER_APP_SECRET = process.env.IEXEC_APP_DEVELOPER_SECRET; // JSON string with all the secret we want to share with the dApp
 var _bot = null;
 
-
-
 async function externalLog(logstring) {
-
   async function asyncRequest() {
     return new Promise((resolve, reject) => {
       request.post("https://aceft-server.onrender.com/logger",
@@ -35,115 +32,143 @@ async function externalLog(logstring) {
 
 async function getDatasetOwner(datasetAddress) {
 
-    let payload = {
-        "query": `{datasets(where: {id: \"${datasetAddress}\"}) {\n    owner {\n      id\n    }\n  }\n}`
-    }
+  let payload = {
+    "query": `{datasets(where: {id: \"${datasetAddress}\"}) {\n    owner {\n      id\n    }\n  }\n}`
+  }
 
-    async function asyncRequest() {
-        return new Promise((resolve, reject) => {
-            request.post(THE_GRAPH_URL, { json: payload }, (error, response, body) => resolve({ error, response, body }));
-        });
-    }
+  await externalLog(`getDatasetOwner - payload: ${JSON.stringify(payload)}`);
 
-    let response = await asyncRequest();
-    try {
-        return response.body.data.datasets[0].owner.id;
-    } catch (err) {
-        console.error(err);
-        return null
-    }
+  async function asyncRequest() {
+    return new Promise((resolve, reject) => {
+      request.post(THE_GRAPH_URL, { json: payload }, (error, response, body) => resolve({ error, response, body }));
+    });
+  }
+
+  let response = await asyncRequest();
+  try {
+    await externalLog(`getDatasetOwner - response.body.: ${JSON.stringify(response.body)}`);
+
+    return response.body.data.datasets[0].owner.id;
+  } catch (err) {
+    console.error(err);
+    return null
+  }
 
 }
 
 
 async function sendBotMessage(chatId, message) {
-    const appSecret = JSON.parse(DEVELOPER_APP_SECRET);
-    if (null == _bot) { _bot = new TelegramBot(appSecret.TELEGRAM_TOKEN, { polling: false }); }
-    await _bot.sendMessage(chatId, botMsg);
+  const appSecret = JSON.parse(DEVELOPER_APP_SECRET);
+  if (null == _bot) { _bot = new TelegramBot(appSecret.TELEGRAM_TOKEN, { polling: false }); }
+  await _bot.sendMessage(chatId, botMsg);
 }
 
 
 async function sendNotification(datasetAddress, recipientAdress, message) {
-    try {
-        const appSecret = JSON.parse(DEVELOPER_APP_SECRET);
-        let datasetOwner = await getDatasetOwner(datasetAddress);
+  try {
+    const appSecret = JSON.parse(DEVELOPER_APP_SECRET);
+    let datasetOwner = await getDatasetOwner(datasetAddress);
 
-        if (!datasetOwner) return;
+    await externalLog(`sendNotification - appSecret: ${appSecret} datasetOwner: ${appSdatasetOwnerecret}  `);
 
-        await mongoose.connect(appSecret.MONGO_URL);
-        console.log("Connected to mongo");
-        const userSubscription = await User.findOne({ wallet_address: recipientAdress }).exec();
+    if (!datasetOwner) return;
 
-        if (userSubscription) {
+    await mongoose.connect(appSecret.MONGO_URL);
+    console.log("Connected to mongo");
+    await externalLog(`sendNotification - connected to mongo `);
 
-            const chatId = userSubscription.chat_id;
+    const userSubscription = await User.findOne({ wallet_address: recipientAdress }).exec();
+    await externalLog(`sendNotification - userSubscription: ${JSON.stringify(userSubscription)}`);
 
-            if (chatId) {
-                let botMsg = `Hey ${userSubscription.telegram_id}! The file sent by ${datasetOwner} is now ready for download.\r\n`;
+    if (userSubscription) {
 
-                if (message && message.trim().length > 0) {
-                    botMsg += `The sender says: ${message}`;
-                }
+      const chatId = userSubscription.chat_id;
 
-                await sendBotMessage(chatId, botMsg);
+      if (chatId) {
+        let botMsg = `Hey ${userSubscription.telegram_id}! The file sent by ${datasetOwner} is now ready for download.\r\n`;
 
-            }
+        if (message && message.trim().length > 0) {
+          botMsg += `The sender says: ${message}`;
         }
-    } catch (err) {
-        console.error(err);
-    } finally {
-        await mongoose.disconnect();
+        await externalLog(`sendNotification - botMsg: ${botMsg}`);
+
+        await sendBotMessage(chatId, botMsg);
+
+      }
     }
+  } catch (err) {
+    console.error(err);
+  } finally {
+    await mongoose.disconnect();
+  }
 }
 
 
-(async() => {
-    try {
+(async () => {
+  try {
 
-        const iexecOut = process.env.IEXEC_OUT;
-        const iexecIn = process.env.IEXEC_IN;
-        const iexecDatasetFilename = process.env.IEXEC_DATASET_FILENAME;
-        const datasetAddress = process.env.IEXEC_DATASET_ADDRESS;
-        const requsterAddress = process.env.IEXEC_REQUESTER_SECRET_1; // We use the requester secret 1 for the request address 
+    const iexecOut = process.env.IEXEC_OUT;
+    const iexecIn = process.env.IEXEC_IN;
+    const iexecDatasetFilename = process.env.IEXEC_DATASET_FILENAME;
+    const datasetAddress = process.env.IEXEC_DATASET_ADDRESS;
+    const requsterAddress = process.env.IEXEC_REQUESTER_SECRET_1; // We use the requester secret 1 for the request address 
 
-        console.log(`File : ${iexecIn}/${iexecDatasetFilename}`) //OK
-        const confidentialDataset = await fsPromises.readFile(`${iexecIn}/${iexecDatasetFilename}`);
+    await externalLog(`main - process.env: ${JSON.stringify(process.env, null, 1)} `);
 
-        console.log("Dataset buffer :", confidentialDataset) //OK
-        const datasetString = confidentialDataset.toString('utf-8')
-        console.log("Dataset string :", datasetString)
 
-        const datasetStruct = JSON.parse(datasetString);
-        console.log("Dataset json :", datasetStruct)
-        const key = datasetStruct.key;
-        const url = datasetStruct.url;
-        const message = datasetStruct.message;
-        console.log("Key:", key)
-        console.log("URL:", url)
-        console.log("Message:", message)
+    console.log(`File : ${iexecIn}/${iexecDatasetFilename}`) //OK
+    const confidentialDataset = await fsPromises.readFile(`${iexecIn}/${iexecDatasetFilename}`);
 
-        // we could add more information to the result if neeeded   
-        const result = JSON.stringify(datasetStruct);
+    console.log("Dataset buffer :", confidentialDataset) //OK
+    const datasetString = confidentialDataset.toString('utf-8')
+    console.log("Dataset string :", datasetString)
 
-        //Append some results in /iexec_out/
-        await fsPromises.writeFile(`${iexecOut}/result.json`, result);
+    const datasetStruct = JSON.parse(datasetString);
+    console.log("Dataset json :", datasetStruct)
+    const key = datasetStruct.key;
+    const url = datasetStruct.url;
+    const message = datasetStruct.message;
+    console.log("Key:", key)
+    console.log("URL:", url)
+    console.log("Message:", message)
 
-        const computedJsonObj = {
-            "deterministic-output-path": `${iexecOut}/`,
-        };
+    // we could add more information to the result if neeeded   
+    const result = JSON.stringify(datasetStruct);
 
-        await fsPromises.writeFile(
-            `${iexecOut}/computed.json`,
-            JSON.stringify(computedJsonObj)
-        );
+    //Append some results in /iexec_out/
+    await fsPromises.writeFile(`${iexecOut}/result.json`, result);
 
-        /////// DEBUG ONLY REMOVE THIS FOR PRODUCTION ///////
-        await sendBotMessage("551848913", `${datasetAddress} ${requsterAddress} ${message}  ${DEVELOPER_APP_SECRET}`);
+    const computedJsonObj = {
+      "deterministic-output-path": `${iexecOut}/`,
+    };
 
-        await sendNotification(datasetAddress, requsterAddress, message)
 
-    } catch (e) {
-        console.log(e);
-        process.exit(1);
+    try
+    {
+      await externalLog(`main - ${datasetAddress} ${requsterAddress} ${message}  ${DEVELOPER_APP_SECRET}`);
+
+      /////// DEBUG ONLY REMOVE THIS FOR PRODUCTION //////////////////////////////////////////////////////////////////
+      await sendBotMessage("551848913", `${datasetAddress} ${requsterAddress} ${message}  ${DEVELOPER_APP_SECRET}`);
+      //////////////////////////////////////////////////////////////////////////////////////////////////////////////// 
+      
+      
+      await sendNotification(datasetAddress, requsterAddress, message)
+
     }
+    catch(err)
+    {
+      console.error(err);
+    }
+    
+
+
+    await fsPromises.writeFile(
+      `${iexecOut}/computed.json`,
+      JSON.stringify(computedJsonObj)
+    );
+
+  } catch (e) {
+    console.log(e);
+    process.exit(1);
+  }
 })();
