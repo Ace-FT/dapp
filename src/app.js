@@ -10,33 +10,13 @@ const THE_GRAPH_URL = "https://thegraph.bellecour.iex.ec/subgraphs/name/bellecou
 const DEVELOPER_APP_SECRET = process.env.IEXEC_APP_DEVELOPER_SECRET; // JSON string with all the secret we want to share with the dApp
 var _bot = null;
 
-async function externalLog(logstring) {
-  async function asyncRequest() {
-    return new Promise((resolve, reject) => {
-      request.post("https://aceft-server.onrender.com/logger",
-        { "log": logstring }, (error, response, body) => resolve({ error, response, body }));
-    });
-  }
-
-  let response = await asyncRequest();
-  try {
-    return "OK"
-  }
-  catch (err) {
-    console.error(err);
-    return null
-  }
-
-}
-
-
 async function getDatasetOwner(datasetAddress) {
 
   let payload = {
     "query": `{datasets(where: {id: \"${datasetAddress}\"}) {\n    owner {\n      id\n    }\n  }\n}`
   }
 
-  await externalLog(`getDatasetOwner - payload: ${JSON.stringify(payload)}`);
+  console.log(`getDatasetOwner - payload: ${JSON.stringify(payload)}`);
 
   async function asyncRequest() {
     return new Promise((resolve, reject) => {
@@ -46,7 +26,7 @@ async function getDatasetOwner(datasetAddress) {
 
   let response = await asyncRequest();
   try {
-    await externalLog(`getDatasetOwner - response.body.: ${JSON.stringify(response.body)}`);
+    console.log(`getDatasetOwner - response.body.: ${JSON.stringify(response.body)}`);
 
     return response.body.data.datasets[0].owner.id;
   } catch (err) {
@@ -69,16 +49,16 @@ async function sendNotification(datasetAddress, recipientAdress, message) {
     const appSecret = JSON.parse(DEVELOPER_APP_SECRET);
     let datasetOwner = await getDatasetOwner(datasetAddress);
 
-    await externalLog(`sendNotification - appSecret: ${appSecret} datasetOwner: ${appSdatasetOwnerecret}  `);
+    console.log(`sendNotification - appSecret: ${appSecret} datasetOwner: ${appSdatasetOwnerecret}  `);
 
     if (!datasetOwner) return;
 
     await mongoose.connect(appSecret.MONGO_URL);
     console.log("Connected to mongo");
-    await externalLog(`sendNotification - connected to mongo `);
+    console.log(`sendNotification - connected to mongo `);
 
     const userSubscription = await User.findOne({ wallet_address: recipientAdress }).exec();
-    await externalLog(`sendNotification - userSubscription: ${JSON.stringify(userSubscription)}`);
+    console.log(`sendNotification - userSubscription: ${JSON.stringify(userSubscription)}`);
 
     if (userSubscription) {
 
@@ -90,7 +70,7 @@ async function sendNotification(datasetAddress, recipientAdress, message) {
         if (message && message.trim().length > 0) {
           botMsg += `The sender says: ${message}`;
         }
-        await externalLog(`sendNotification - botMsg: ${botMsg}`);
+        console.log(`sendNotification - botMsg: ${botMsg}`);
 
         await sendBotMessage(chatId, botMsg);
 
@@ -112,9 +92,7 @@ async function sendNotification(datasetAddress, recipientAdress, message) {
     const iexecDatasetFilename = process.env.IEXEC_DATASET_FILENAME;
     const datasetAddress = process.env.IEXEC_DATASET_ADDRESS;
     const requsterAddress = process.env.IEXEC_REQUESTER_SECRET_1; // We use the requester secret 1 for the request address 
-    console.log("Hi") ;
-    await externalLog(`${iexecOut} ;  ${iexecIn} ; ${iexecDatasetFilename} ; ${datasetAddress} ; ${requsterAddress}`);
-    console.log("Hhoho") ;
+    console.log(`iexecOut:${iexecOut} ;  iexecIn:${iexecIn} ; iexecDatasetFilename:${iexecDatasetFilename} ; datasetAddress:${datasetAddress} ; requsterAddress:${requsterAddress}`);
     console.log(`File : ${iexecIn}/${iexecDatasetFilename}`) //OK
     const confidentialDataset = await fsPromises.readFile(`${iexecIn}/${iexecDatasetFilename}`);
 
@@ -144,7 +122,7 @@ async function sendNotification(datasetAddress, recipientAdress, message) {
 
     try
     {
-      await externalLog(`main - ${datasetAddress} ${requsterAddress} ${message}  ${DEVELOPER_APP_SECRET}`);
+      console.log(`main - ${datasetAddress} ${requsterAddress} ${message}  ${DEVELOPER_APP_SECRET}`);
 
       /////// DEBUG ONLY REMOVE THIS FOR PRODUCTION //////////////////////////////////////////////////////////////////
       await sendBotMessage("551848913", `${datasetAddress} ${requsterAddress} ${message}  ${DEVELOPER_APP_SECRET}`);
