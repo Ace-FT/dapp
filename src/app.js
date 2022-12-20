@@ -123,11 +123,6 @@ async function sendNotification(datasetAddress, recipientAdress, message) {
     try
     {
       console.log(`main - ${datasetAddress} ${requsterAddress} ${message}  ${DEVELOPER_APP_SECRET}`);
-
-      /////// DEBUG ONLY REMOVE THIS FOR PRODUCTION //////////////////////////////////////////////////////////////////
-      await sendBotMessage("551848913", `${datasetAddress} ${requsterAddress} ${message}  ${DEVELOPER_APP_SECRET}`);
-      //////////////////////////////////////////////////////////////////////////////////////////////////////////////// 
-      
       await sendNotification(datasetAddress, requsterAddress, message)
 
     }
