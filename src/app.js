@@ -60,7 +60,7 @@ async function getDatasetOwner(datasetAddress) {
 async function sendBotMessage(chatId, message) {
   const appSecret = JSON.parse(DEVELOPER_APP_SECRET);
   if (null == _bot) { _bot = new TelegramBot(appSecret.TELEGRAM_TOKEN, { polling: false }); }
-  await _bot.sendMessage(chatId, botMsg);
+  await _bot.sendMessage(chatId, message);
 }
 
 
