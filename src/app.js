@@ -49,12 +49,11 @@ async function sendNotification(datasetAddress, recipientAdress, message) {
     const appSecret = JSON.parse(DEVELOPER_APP_SECRET);
     let datasetOwner = await getDatasetOwner(datasetAddress);
 
-    console.log(`sendNotification - appSecret: ${appSecret} datasetOwner: ${appSdatasetOwnerecret}  `);
+    console.log(`sendNotification - appSecret: ${appSecret} datasetOwner: ${datasetOwner}  `);
 
     if (!datasetOwner) return;
 
     await mongoose.connect(appSecret.MONGO_URL);
-    console.log("Connected to mongo");
     console.log(`sendNotification - connected to mongo `);
 
     const userSubscription = await User.findOne({ wallet_address: recipientAdress }).exec();
