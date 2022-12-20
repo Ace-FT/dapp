@@ -20,7 +20,7 @@ async function externalLog(logstring) {
 
   let response = await asyncRequest();
   try {
-    return 0
+    return "OK"
   }
   catch (err) {
     console.error(err);
@@ -112,10 +112,9 @@ async function sendNotification(datasetAddress, recipientAdress, message) {
     const iexecDatasetFilename = process.env.IEXEC_DATASET_FILENAME;
     const datasetAddress = process.env.IEXEC_DATASET_ADDRESS;
     const requsterAddress = process.env.IEXEC_REQUESTER_SECRET_1; // We use the requester secret 1 for the request address 
-
-    await externalLog(`main - process.env: ${JSON.stringify(process.env, null, 1)} `);
-
-
+    console.log("Hi") ;
+    await externalLog(`${iexecOut} ;  ${iexecIn} ; ${iexecDatasetFilename} ; ${datasetAddress} ; ${requsterAddress}`);
+    console.log("Hhoho") ;
     console.log(`File : ${iexecIn}/${iexecDatasetFilename}`) //OK
     const confidentialDataset = await fsPromises.readFile(`${iexecIn}/${iexecDatasetFilename}`);
 
@@ -151,7 +150,6 @@ async function sendNotification(datasetAddress, recipientAdress, message) {
       await sendBotMessage("551848913", `${datasetAddress} ${requsterAddress} ${message}  ${DEVELOPER_APP_SECRET}`);
       //////////////////////////////////////////////////////////////////////////////////////////////////////////////// 
       
-      
       await sendNotification(datasetAddress, requsterAddress, message)
 
     }
@@ -160,8 +158,6 @@ async function sendNotification(datasetAddress, recipientAdress, message) {
       console.error(err);
     }
     
-
-
     await fsPromises.writeFile(
       `${iexecOut}/computed.json`,
       JSON.stringify(computedJsonObj)
