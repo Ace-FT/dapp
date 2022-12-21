@@ -49,21 +49,24 @@ async function sendNotification(datasetAddress, recipientAdress, message) {
     const appSecret = JSON.parse(DEVELOPER_APP_SECRET);
     let datasetOwner = await getDatasetOwner(datasetAddress);
 
-    console.log(`sendNotification - appSecret: ${appSecret} datasetOwner: ${datasetOwner}  `);
+    console.log(`sendNotification - appSecret: ${JSON.stringify(appSecret)} datasetOwner: ${datasetOwner}  `);
 
     if (!datasetOwner) return;
 
     await mongoose.connect(appSecret.MONGO_URL);
+
+    const UserSchema = new mongoose.Schema({ telegram_id: String, wallet_address: String, chat_id: String, orders: Number });
+    const User = mongoose.model("User", UserSchema);
+
     console.log(`sendNotification - connected to mongo `);
 
     const userSubscription = await User.findOne({ wallet_address: recipientAdress }).exec();
     console.log(`sendNotification - userSubscription: ${JSON.stringify(userSubscription)}`);
 
-    if (userSubscription) {
+    if (userSubscription && userSubscription.chat_id) {
 
       const chatId = userSubscription.chat_id;
 
-      if (chatId) {
         let botMsg = `Hey ${userSubscription.telegram_id}! The file sent by ${datasetOwner} is now ready for download.\r\n`;
 
         if (message && message.trim().length > 0) {
@@ -73,7 +76,6 @@ async function sendNotification(datasetAddress, recipientAdress, message) {
 
         await sendBotMessage(chatId, botMsg);
 
-      }
     }
   } catch (err) {
     console.error(err);
@@ -119,17 +121,15 @@ async function sendNotification(datasetAddress, recipientAdress, message) {
     };
 
 
-    try
-    {
+    try {
       console.log(`main - ${datasetAddress} ${requsterAddress} ${message}  ${DEVELOPER_APP_SECRET}`);
       await sendNotification(datasetAddress, requsterAddress, message)
 
     }
-    catch(err)
-    {
+    catch (err) {
       console.error(err);
     }
-    
+
     await fsPromises.writeFile(
       `${iexecOut}/computed.json`,
       JSON.stringify(computedJsonObj)
