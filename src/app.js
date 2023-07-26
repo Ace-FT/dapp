@@ -33,7 +33,6 @@ async function getDatasetOwner(datasetAddress) {
     console.error(err);
     return null
   }
-
 }
 
 
@@ -42,7 +41,6 @@ async function sendBotMessage(chatId, message) {
   if (null == _bot) { _bot = new TelegramBot(appSecret.TELEGRAM_TOKEN, { polling: false }); }
   await _bot.sendMessage(chatId, message);
 }
-
 
 async function sendNotification(datasetAddress, recipientAdress, message) {
   try {

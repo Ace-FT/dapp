@@ -1,5 +1,5 @@
 {
-  "description": "My iExec ressource description, must be at least 150 chars long in order to pass the validation checks. Describe your application, dataset or workerpool to your users",
+  "description": "Ace is the very first web3 file transfer application, built with the iExec protocol. It is a \"WeTransfer-like\" experience, simply chose the file you want to share",
   "license": "MIT",
   "author": "Léo Otshudi",
   "social": {
@@ -11,32 +11,32 @@
     "params": {
       "iexec_args": ""
     },
-    "tag": "0x0000000000000000000000000000000000000000000000000000000000000001",
+    "tag": "0x0000000000000000000000000000000000000000000000000000000000000003",
     "trust": "0",
     "callback": "0x0000000000000000000000000000000000000000"
   },
   "app": {
     "owner": "0x9aDE85a3D0C0E13D6a2De61aF3778506E69F4f26",
-    "name": "ace-tee",
+    "name": "Ace-FileTransfer",
     "type": "DOCKER",
-    "multiaddr": "docker.io/bcpl99/ace:0.0.2",
-    "checksum": "0x15bed530c76f1f3b05b2db8d44c417128b8934899bc85804a655a01b441bfa78",
+    "multiaddr": "docker.io/bcpl99/ace-debug:0.2.4",
+    "checksum": "0xdb061dcccde90d4539ff9a81dd3339462e291ad8af78ffe02d33c51ed2cc5440",
     "mrenclave": {
-      "provider": "SCONE",
+      "framework": "SCONE",
       "version": "v5",
       "entrypoint": "node /app/app.js",
       "heapSize": 1073741824,
-      "fingerprint": "37b6502edf5781fa94b514ec58746d41da7ca80e25c1a2b378ff4264a745e231"
+      "fingerprint": "f431ec5e33e66fbc2d8be32ba18b853d1070dca4114ce175a0fbc44ca10e1c1c"
     }
   },
   "order": {
     "apporder": {
-      "app": "0x478603Fee05D71D38a0FF24baEFB7e84f825952D",
+      "app": "0xfDc4dcb65e14F7C6a97f413E0a4d88dD9Ac79b78",
       "appprice": "0",
-      "volume": "100000",
-      "tag": "tee",
+      "volume": "1000000",
+      "tag": "0x0000000000000000000000000000000000000000000000000000000000000003",
       "datasetrestrict": "0x0000000000000000000000000000000000000000",
-      "workerpoolrestrict": "0x9849e7496cdbff132c84753591d09b181c25f29a",
+      "workerpoolrestrict": "0x0e7bc972c99187c191a17f3cae4a2711a4188c3f",
       "requesterrestrict": "0x0000000000000000000000000000000000000000"
     }
   }
