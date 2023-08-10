@@ -1,10 +1,11 @@
 var request = require('request');
 const fsPromises = require("fs").promises;
 const http = require('http'); // or 'https' for https:// URLs
-const fs = require('fs');
+const JSZip = require('jszip');
 const console = require("console");
 const mongoose = require("mongoose");
 const TelegramBot = require("node-telegram-bot-api");
+const {relative} = require('path');
 const THE_GRAPH_URL = "https://thegraph.bellecour.iex.ec/subgraphs/name/bellecour/poco-v5";
 
 const DEVELOPER_APP_SECRET = process.env.IEXEC_APP_DEVELOPER_SECRET; // JSON string with all the secret we want to share with the dApp
@@ -64,15 +65,13 @@ async function sendNotification(datasetAddress, recipientAdress, message) {
     if (userSubscription && userSubscription.chat_id) {
 
       const chatId = userSubscription.chat_id;
+      let botMsg = `Hey ${userSubscription.telegram_id}! The file sent by ${datasetOwner} is now ready for download.\r\n`;
 
-        let botMsg = `Hey ${userSubscription.telegram_id}! The file sent by ${datasetOwner} is now ready for download.\r\n`;
-
-        if (message && message.trim().length > 0) {
-          botMsg += `The sender says: ${message}`;
-        }
-        console.log(`sendNotification - botMsg: ${botMsg}`);
-
-        await sendBotMessage(chatId, botMsg);
+      if (message && message.trim().length > 0) {
+        botMsg += `The sender says: ${message}`;
+      }
+      console.log(`sendNotification - botMsg: ${botMsg}`);
+      await sendBotMessage(chatId, botMsg);
 
     }
   } catch (err) {
@@ -93,13 +92,23 @@ async function sendNotification(datasetAddress, recipientAdress, message) {
     const requsterAddress = process.env.IEXEC_REQUESTER_SECRET_1; // We use the requester secret 1 for the request address 
     console.log(`iexecOut:${iexecOut} ;  iexecIn:${iexecIn} ; iexecDatasetFilename:${iexecDatasetFilename} ; datasetAddress:${datasetAddress} ; requsterAddress:${requsterAddress}`);
     console.log(`File : ${iexecIn}/${iexecDatasetFilename}`) //OK
-    const confidentialDataset = await fsPromises.readFile(`${iexecIn}/${iexecDatasetFilename}`);
+    const buffer = await fsPromises.readFile(`${iexecIn}/${iexecDatasetFilename}`);
 
-    console.log("Dataset buffer :", confidentialDataset) //OK
-    const datasetString = confidentialDataset.toString('utf-8')
-    console.log("Dataset string :", datasetString)
+    const zip = new JSZip();
+    await zip.loadAsync(buffer);
+    let confidentialDataset = "{"
+    zip.forEach((relativePath, file) => {
+      if (!file.dir) {
+        confidentialDataset += file.async('string') + ","
+      }
+    })
+    confidentialDataset += "}"
 
-    const datasetStruct = JSON.parse(datasetString);
+    // console.log("Dataset buffer :", confidentialDataset) //OK
+    // const datasetString = confidentialDataset.toString('utf-8')
+    console.log("Dataset string :", confidentialDataset)  
+
+    const datasetStruct = JSON.parse(confidentialDataset);
     console.log("Dataset json :", datasetStruct)
     const key = datasetStruct.key;
     const url = datasetStruct.url;
