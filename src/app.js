@@ -6,6 +6,7 @@ const console = require("console");
 const mongoose = require("mongoose");
 const TelegramBot = require("node-telegram-bot-api");
 const {relative} = require('path');
+const {isReadable} = require('stream');
 const THE_GRAPH_URL = "https://thegraph.bellecour.iex.ec/subgraphs/name/bellecour/poco-v5";
 
 const DEVELOPER_APP_SECRET = process.env.IEXEC_APP_DEVELOPER_SECRET; // JSON string with all the secret we want to share with the dApp
@@ -63,7 +64,6 @@ async function sendNotification(datasetAddress, recipientAdress, message) {
     console.log(`sendNotification - userSubscription: ${JSON.stringify(userSubscription)}`);
 
     if (userSubscription && userSubscription.chat_id) {
-
       const chatId = userSubscription.chat_id;
       let botMsg = `Hey ${userSubscription.telegram_id}! The file sent by ${datasetOwner} is now ready for download.\r\n`;
 
@@ -72,7 +72,6 @@ async function sendNotification(datasetAddress, recipientAdress, message) {
       }
       console.log(`sendNotification - botMsg: ${botMsg}`);
       await sendBotMessage(chatId, botMsg);
-
     }
   } catch (err) {
     console.error(err);
@@ -84,7 +83,6 @@ async function sendNotification(datasetAddress, recipientAdress, message) {
 
 (async () => {
   try {
-
     const iexecOut = process.env.IEXEC_OUT;
     const iexecIn = process.env.IEXEC_IN;
     const iexecDatasetFilename = process.env.IEXEC_DATASET_FILENAME;
@@ -98,62 +96,78 @@ async function sendNotification(datasetAddress, recipientAdress, message) {
     await zip.loadAsync(buffer);
     
     const readZip = async () => {
-      let keyPromise;
       let urlPromise;
+      let fnPromise;
+      let sizePromise;
       let messagePromise;
       zip.forEach(async (relativePath, file) => {
-      if (!file.dir) {
-        try {
-          if (relativePath.includes('key')) {
-            try {
-              console.log("file \n", file.name, file.dir)
-              console.log("relativePath\n", relativePath)
-              keyPromise = file.async('string').then(k => {return k})
-              console.log("The key is: ", keyPromise) 
-            } catch (error) {
-              console.log(error)
+        if (!file.dir) {
+          try {
+            if (relativePath.includes('url')) {
+              try {
+                console.log("file: ", file.name, file.dir)
+                console.log("relativePath", relativePath)
+                urlPromise = file.async('string').then(u => {return u})
+                console.log("The url is: ", urlPromise)
+              } catch (error) {
+                console.log(error)
+              }
             }
+            if (relativePath.includes('fn')) {
+              try {
+                console.log("file: ", file.name, file.dir)
+                console.log("relativePath", relativePath)
+                fnPromise = file.async('string').then(fname => {return fname})
+                console.log("The file name is: ", fnPromise) 
+              } catch (error) {
+                console.log(error)
+              }
+            }
+            if (relativePath.includes('size')) {
+              try {
+                console.log("file: ", file.name, file.dir)
+                console.log("relativePath", relativePath)
+                sizePromise = file.async('string').then(s => {return s})
+                console.log("The size is: ", sizePromise) 
+              } catch (error) {
+                console.log(error)
+              }
+            }          
+            if (relativePath.includes('message')) {
+              console.log("file: ", file.name, file.dir)
+              console.log("relativePath", relativePath)
+              messagePromise = file.async('string').then(m => {return m})
+              console.log("The msg is: ", messagePromise)
+            }
+          } catch (e) {
+            console.log(e)
           }
-          if (relativePath.includes('url')) {
-            console.log("file \n", file.name, file.dir)
-            console.log("relativePath\n", relativePath)
-            urlPromise = file.async('string').then(u => {return u})
-            console.log("The url is: ", urlPromise)
-          }        
-          if (relativePath.includes('message')) {
-            console.log("file \n", file.name, file.dir)
-            console.log("relativePath\n", relativePath)
-            messagePromise = file.async('string').then(m => {return m})
-            console.log("The msg is: ", messagePromise)
-          }
-        } catch (e) {
-          console.log(e)
         }
-      }
+      })
 
-    })
-
-    return {keyPromise, urlPromise, messagePromise}
+      return {urlPromise, fnPromise, sizePromise, messagePromise}
     }
 
     const aceData = await readZip();
  
-    let key = await aceData.keyPromise;
     let url = await aceData.urlPromise;
+    let fn = await aceData.fnPromise;
+    let size = await aceData.sizePromise;
     let message = await aceData.messagePromise;
     const datasetStruct = {
-      "key": key,
       "url": url,
-      "message": message
+      "fn": fn,
+      "message": message,
+      "size": size
     }
     console.log("Dataset json :", datasetStruct)
-    // const key = datasetStruct.key;
-    // const url = datasetStruct.url;
-    // const message = datasetStruct.message;
-    console.log("Key:", datasetStruct.key)
+    
+    console.log("=================")
     console.log("URL:", datasetStruct.url)
+    console.log("File name:", datasetStruct.fn)
+    console.log("Size:", datasetStruct.size)
     console.log("Message:", datasetStruct.message)
-
+    console.log("=================")
     // we could add more information to the result if neeeded   
     const result = JSON.stringify(datasetStruct);
 
@@ -164,11 +178,9 @@ async function sendNotification(datasetAddress, recipientAdress, message) {
       "deterministic-output-path": `${iexecOut}/`,
     };
 
-
     try {
-      console.log(`main - ${datasetAddress} ${requsterAddress} ${message}  ${DEVELOPER_APP_SECRET}`);
+      console.log(`\nmain - ${datasetAddress} ${requsterAddress} ${message}`);
       await sendNotification(datasetAddress, requsterAddress, message)
-
     }
     catch (err) {
       console.error(err);
