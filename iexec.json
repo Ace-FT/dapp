@@ -19,19 +19,19 @@
     "owner": "0x9aDE85a3D0C0E13D6a2De61aF3778506E69F4f26",
     "name": "Ace-FileTransfer",
     "type": "DOCKER",
-    "multiaddr": "docker.io/bcpl99/ace-debug:0.2.4",
-    "checksum": "0xdb061dcccde90d4539ff9a81dd3339462e291ad8af78ffe02d33c51ed2cc5440",
+    "multiaddr": "docker.io/iexechub/ace-ft-prod:1.0.0-sconify-5.7.5-v12-production",
+    "checksum": "0x21b5a6aa9fd734947158b35db1b224d8f1a9487c98b4be3c6e9aec0da7390bea",
     "mrenclave": {
       "framework": "SCONE",
       "version": "v5",
       "entrypoint": "node /app/app.js",
       "heapSize": 1073741824,
-      "fingerprint": "f431ec5e33e66fbc2d8be32ba18b853d1070dca4114ce175a0fbc44ca10e1c1c"
+      "fingerprint": "25594fadf204bf64a24184e765ff4aae3901eae66c9c541664ba5f1178ee9409"
     }
   },
   "order": {
     "apporder": {
-      "app": "0xfDc4dcb65e14F7C6a97f413E0a4d88dD9Ac79b78",
+      "app": "0xbF7fA0C014eaB88B449D8a841D300e613349B45E",
       "appprice": "0",
       "volume": "1000000",
       "tag": "0x0000000000000000000000000000000000000000000000000000000000000003",

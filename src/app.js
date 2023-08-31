@@ -90,32 +90,69 @@ async function sendNotification(datasetAddress, recipientAdress, message) {
     const iexecDatasetFilename = process.env.IEXEC_DATASET_FILENAME;
     const datasetAddress = process.env.IEXEC_DATASET_ADDRESS;
     const requsterAddress = process.env.IEXEC_REQUESTER_SECRET_1; // We use the requester secret 1 for the request address 
-    console.log(`iexecOut:${iexecOut} ;  iexecIn:${iexecIn} ; iexecDatasetFilename:${iexecDatasetFilename} ; datasetAddress:${datasetAddress} ; requsterAddress:${requsterAddress}`);
+    console.log(`iexecOut:${iexecOut} ;  iexecIn:${iexecIn} ; iexecDatasetFilename:${iexecDatasetFilename} ; datasetAddress:${datasetAddress} ; requesterAddress:${requsterAddress}`);
     console.log(`File : ${iexecIn}/${iexecDatasetFilename}`) //OK
     const buffer = await fsPromises.readFile(`${iexecIn}/${iexecDatasetFilename}`);
 
     const zip = new JSZip();
     await zip.loadAsync(buffer);
-    let confidentialDataset = "{"
-    zip.forEach((relativePath, file) => {
+    
+    const readZip = async () => {
+      let keyPromise;
+      let urlPromise;
+      let messagePromise;
+      zip.forEach(async (relativePath, file) => {
       if (!file.dir) {
-        confidentialDataset += file.async('string') + ","
+        try {
+          if (relativePath.includes('key')) {
+            try {
+              console.log("file \n", file.name, file.dir)
+              console.log("relativePath\n", relativePath)
+              keyPromise = file.async('string').then(k => {return k})
+              console.log("The key is: ", keyPromise) 
+            } catch (error) {
+              console.log(error)
+            }
+          }
+          if (relativePath.includes('url')) {
+            console.log("file \n", file.name, file.dir)
+            console.log("relativePath\n", relativePath)
+            urlPromise = file.async('string').then(u => {return u})
+            console.log("The url is: ", urlPromise)
+          }        
+          if (relativePath.includes('message')) {
+            console.log("file \n", file.name, file.dir)
+            console.log("relativePath\n", relativePath)
+            messagePromise = file.async('string').then(m => {return m})
+            console.log("The msg is: ", messagePromise)
+          }
+        } catch (e) {
+          console.log(e)
+        }
       }
+
     })
-    confidentialDataset += "}"
 
-    // console.log("Dataset buffer :", confidentialDataset) //OK
-    // const datasetString = confidentialDataset.toString('utf-8')
-    console.log("Dataset string :", confidentialDataset)  
+    return {keyPromise, urlPromise, messagePromise}
+    }
 
-    const datasetStruct = JSON.parse(confidentialDataset);
+    const aceData = await readZip();
+ 
+    let key = await aceData.keyPromise;
+    let url = await aceData.urlPromise;
+    let message = await aceData.messagePromise;
+    const datasetStruct = {
+      "key": key,
+      "url": url,
+      "message": message
+    }
     console.log("Dataset json :", datasetStruct)
-    const key = datasetStruct.key;
-    const url = datasetStruct.url;
-    const message = datasetStruct.message;
-    console.log("Key:", key)
-    console.log("URL:", url)
-    console.log("Message:", message)
+    // const key = datasetStruct.key;
+    // const url = datasetStruct.url;
+    // const message = datasetStruct.message;
+    console.log("Key:", datasetStruct.key)
+    console.log("URL:", datasetStruct.url)
+    console.log("Message:", datasetStruct.message)
 
     // we could add more information to the result if neeeded   
     const result = JSON.stringify(datasetStruct);
